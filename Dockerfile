@@ -96,6 +96,23 @@ RUN curl -sL --retry 3 \
 
 CMD ["bin/spark-class", "org.apache.spark.deploy.master.Master"]
 
+# ZEPPELIN
+ENV ZEPPELIN_PORT 8080
+ENV ZEPPELIN_HOME /usr/local/zeppelin
+ 
+#install Zeppelin
+RUN wget http://apache.cs.utah.edu/zeppelin/zeppelin-0.8.1/zeppelin-0.8.1-bin-all.tgz && \
+  tar -zxf zeppelin-0.8.1-bin-all.tgz -C /usr/local/ && \
+  mv /usr/local/zeppelin* $ZEPPELIN_HOME
+ 
+#WORKDIR $ZEPPELIN_HOME
+CMD bin/zeppelin.sh
+
+# copy script to start zeppelin
+ADD zeppelin.sh zeppelin.sh
+
+ENV PATH $PATH:${ZEPPELIN_HOME}/bin
+
 # update PATH in .bashrc
 RUN echo "export PATH=$PATH" >> /root/.bashrc
 
@@ -122,7 +139,7 @@ ADD start-hadoop.sh start-hadoop.sh
 # ADD dataset/* /dataset/
 
 # expose various ports
-EXPOSE 8088 8030 50070 50075 50030 50060 8888 9000 9999
+EXPOSE 8088 8030 50070 50075 50030 50060 8888 9000 9999 8080
 
 # start hadoop
 CMD bash start-hadoop.sh
